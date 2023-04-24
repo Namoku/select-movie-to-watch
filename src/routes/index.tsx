@@ -1,13 +1,20 @@
 import { component$, useSignal, useTask$ } from '@builder.io/qwik'
+import { server$ } from '@builder.io/qwik-city'
 import Search from '~/components/Search'
 import getMovies from '~/services/getMovies'
 import type { Movie } from '~/types'
 
+const getAllMovies = server$(
+  async (value: string) => await getMovies({ search: value })
+)
+
 export default component$(() => {
   const movies = useSignal<Movie[]>([])
+  const search = useSignal('')
 
-  useTask$(async () => {
-    const data = await getMovies({ search: 'avengers' })
+  useTask$(async ({ track }) => {
+    track(() => search.value)
+    const data = await getAllMovies(search.value)
     movies.value = data
   })
 
@@ -15,7 +22,7 @@ export default component$(() => {
     <div class="page">
       <header>
         <h1>Search movies</h1>
-        <Search />
+        <Search search={search} />
       </header>
       <main>
         <ul>

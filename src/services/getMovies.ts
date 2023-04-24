@@ -11,12 +11,12 @@ export default async function getMovies({ search }: { search: string }) {
     .then((res) => res.json())
     .then((data) => data)
 
-  const movies = data.Search.map((movie: any) => ({
+  const movies = data?.Search?.map((movie: any) => ({
     id: movie.imdbID,
     poster: movie.Poster,
     type: movie.Type,
     title: movie.Title,
     year: movie.Year,
   }))
-  return movies as Movie[]
+  return movies as Movie[] ?? []
 }

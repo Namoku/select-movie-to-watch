@@ -12,10 +12,13 @@ export default component$(() => {
   const movies = useSignal<Movie[]>([])
   const search = useSignal('')
 
-  useTask$(async ({ track }) => {
+  useTask$(async ({ track, cleanup }) => {
     track(() => search.value)
-    const data = await getAllMovies(search.value)
-    movies.value = data
+    const debounce = setTimeout(async () => {
+      const data = await getAllMovies(search.value)
+      movies.value = data
+    }, 300)
+    cleanup(() => clearTimeout(debounce))
   })
 
   return (

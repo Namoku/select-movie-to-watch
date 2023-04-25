@@ -1,25 +1,9 @@
-import { component$, useSignal, useTask$ } from '@builder.io/qwik'
-import { server$ } from '@builder.io/qwik-city'
+import { component$ } from '@builder.io/qwik'
 import Search from '~/components/Search'
-import getMovies from '~/services/getMovies'
-import type { Movie } from '~/types'
-
-const getAllMovies = server$(
-  async (value: string) => await getMovies({ search: value })
-)
+import useMovies from '~/hooks/useMovies'
 
 export default component$(() => {
-  const movies = useSignal<Movie[]>([])
-  const search = useSignal('')
-
-  useTask$(async ({ track, cleanup }) => {
-    track(() => search.value)
-    const debounce = setTimeout(async () => {
-      const data = await getAllMovies(search.value)
-      movies.value = data
-    }, 300)
-    cleanup(() => clearTimeout(debounce))
-  })
+  const { movies, search } = useMovies()
 
   return (
     <div class="page">
@@ -29,7 +13,7 @@ export default component$(() => {
       </header>
       <main>
         <ul>
-          {movies.value.map((movie) => (
+          {movies.map((movie) => (
             <li key={movie.id}>
               <article>
                 <h2>{movie.title}</h2>
